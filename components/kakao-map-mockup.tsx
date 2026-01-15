@@ -161,25 +161,6 @@ const routeOptions: RouteOption[] = [
       recommendation: "급가속 습관이 있으시네요. 이 경로에선 부드러운 출발이 안전해요",
     },
   },
-  {
-    id: "highway",
-    label: "고속도로우선",
-    time: 22,
-    distance: "11.3km",
-    taxiFare: "17,000원",
-    mapImage: "/images/map_pangyo_3.png",
-    safetyLevel: "orange",
-    impactScore: 70,
-    aiAnalysis: "경부고속도로 정체 구간 존재",
-    personalizedMessage: "지금 경부고속도로가 조금 막혀요. 그래도 괜찮으시다면 이 길도 나쁘지 않아요 🚗",
-    drivingTip: "정체 구간에서 자주 끼어들기가 있으니 여유롭게 가세요",
-    hazards: [{ id: "crowd", label: "정체구간", icon: "crowd" }],
-    drivingHabitAnalysis: {
-      brakeScore: 70,
-      speedScore: 75,
-      recommendation: "고속도로에서 급제동하시는 경향이 있어요. 앞차와 거리 유지 부탁드려요",
-    },
-  },
   // 안전 경로 (green)
   {
     id: "recommended",
@@ -265,6 +246,29 @@ const routeOptions: RouteOption[] = [
 
 // 도보 경로 옵션 (평균 2시간 10분, 9km)
 const walkRouteOptions: RouteOption[] = [
+    {
+    id: "walk-dangerous",
+    label: "거리우선",
+    time: 108,
+    distance: "8.0km",
+    taxiFare: "약 1,080kcal",
+    warning: "최근 사건 이력",
+    mapImage: "/images/map_pangyo_1.png",
+    safetyLevel: "red",
+    impactScore: 45,
+    aiAnalysis: "최근 인근에서 범죄/소란 이력 존재",
+    personalizedMessage: "시간이 늦었으니, 오늘은 조금 돌아가더라도 사람들이 많이 다니는 대로변으로 가는 게 어때요?",
+    drivingTip: "이 시간대에는 다른 경로를 추천드려요",
+    hazards: [
+      { id: "dark", label: "어두운 구간", icon: "dark" },
+      { id: "construction", label: "인적 드묾", icon: "construction" },
+    ],
+    drivingHabitAnalysis: {
+      brakeScore: 45,
+      speedScore: 50,
+      recommendation: "안전을 위해 다른 경로를 선택하세요",
+    },
+  },
   {
     id: "walk-recommended",
     label: "추천경로",
@@ -346,44 +350,8 @@ const walkRouteOptions: RouteOption[] = [
       speedScore: 85,
       recommendation: "공원길이라 여유롭게 걸으실 수 있어요",
     },
-  },
-  {
-    id: "walk-dangerous",
-    label: "거리우선",
-    time: 108,
-    distance: "8.0km",
-    taxiFare: "약 1,080kcal",
-    warning: "최근 사건 이력",
-    mapImage: "/images/map_pangyo_1.png",
-    safetyLevel: "red",
-    impactScore: 45,
-    aiAnalysis: "최근 인근에서 범죄/소란 이력 존재",
-    personalizedMessage: "시간이 늦었으니, 오늘은 조금 돌아가더라도 사람들이 많이 다니는 대로변으로 가는 게 어때요?",
-    drivingTip: "이 시간대에는 다른 경로를 추천드려요",
-    hazards: [
-      { id: "dark", label: "어두운 구간", icon: "dark" },
-      { id: "construction", label: "인적 드묾", icon: "construction" },
-    ],
-    drivingHabitAnalysis: {
-      brakeScore: 45,
-      speedScore: 50,
-      recommendation: "안전을 위해 다른 경로를 선택하세요",
-    },
-  },
-]
-
-function formatTime(minutes: number): string {
-  const hours = Math.floor(minutes / 60)
-  const mins = minutes % 60
-
-  if (hours === 0) {
-    return `${mins}분`
-  } else if (mins === 0) {
-    return `${hours}시간`
-  } else {
-    return `${hours}시간 ${mins}분`
   }
-}
+]
 
 function getSafetyEmoji(level: RouteOption["safetyLevel"]) {
   switch (level) {
@@ -507,6 +475,19 @@ function TrafficLightIndicator({ level }: { level: RouteOption["safetyLevel"] })
       <span className={cn("text-xs font-semibold", colors.text)}>{getSafetyLabel(level)}</span>
     </div>
   )
+}
+
+function formatTime(minutes: number): string {
+  const hours = Math.floor(minutes / 60)
+  const mins = minutes % 60
+
+  if (hours === 0) {
+    return `${mins}분`
+  } else if (mins === 0) {
+    return `${hours}시간`
+  } else {
+    return `${hours}시간 ${mins}분`
+  }
 }
 
 function DrivingHabitBar({ label, score, color }: { label: string; score: number; color: string }) {
@@ -635,7 +616,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
   useEffect(() => {
     setSelectedRoute(0)
     scrollToRoute(0)
-  }, [selectedTransport])
+  }, [selectedTransport, scrollToRoute])
 
   const currentRoute = currentRouteOptions[selectedRoute]
   const currentSafetyColors = getSafetyColors(currentRoute.safetyLevel)
@@ -716,23 +697,24 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
                 },
               ]
             : [
-                {
-                  title:
-                    currentRoute.safetyLevel === "red"
-                      ? "[속보] 서해안고속도로 추돌 사고... \"도로 결빙 주의 필요\""
-                      : "[속보] 출근 시간대 도로 결빙 사고 증가",
-                  source: "KBS 뉴스",
-                  thumbnail: "/images/news-placeholder.jpg",
-                  url: "#",
-                  publishedAt: "2시간 전",
-                },
-                {
-                  title: "경기 용인·수지 일대 도로 곳곳 결빙 주의보",
-                  source: "연합뉴스",
-                  url: "#",
-                  publishedAt: "4시간 전",
-                },
-              ]
+          {
+            title: currentRoute.safetyLevel === "red"
+              ? "[속보] 서해안고속도로 추돌 사고... \"도로 결빙 주의 필요\""
+              : currentRoute.safetyLevel === "orange"
+              ? "[속보] 출근 시간대 도로 결빙 사고 증가"
+              : "[속보] 서해안고속도로 추돌 사고… \"도로 결빙 주의 필요\"",
+            source: "KBS 뉴스",
+            thumbnail: "/images/news-placeholder.jpg",
+            url: "#",
+            publishedAt: "2시간 전",
+          },
+          {
+            title: "경기 용인·수지 일대 도로 곳곳 결빙 주의보",
+            source: "연합뉴스",
+            url: "#",
+            publishedAt: "4시간 전",
+          },
+        ]
         }
       />
 
@@ -855,7 +837,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
       {/* 지도 영역 */}
       <div className="absolute inset-0 top-[124px] w-full overflow-hidden">
         <div className="absolute inset-0 bg-[#f8f5f0]">
-          {currentRouteOptions.map((route, index) => (
+          {currentRouteOptions.map((route: RouteOption, index: number) => (
             <img
               key={route.id}
               src={route.mapImage || "/placeholder.svg"}
@@ -987,7 +969,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
                     )}>회원님의 운전 성향</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {userDrivingHabits.map((habit) => (
+                    {userDrivingHabits.map((habit: DrivingHabitTag) => (
                       <div
                         key={habit.id}
                         className={cn(
@@ -1045,7 +1027,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
                     )}>회원님의 도보 성향</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {userWalkingHabits.map((habit) => (
+                    {userWalkingHabits.map((habit: string) => (
                       <div
                         key={habit}
                         className={cn(
@@ -1132,7 +1114,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
                 <div className="mt-4 pt-3 border-t border-gray-100">
                   <span className="text-xs text-gray-500 mb-2 block">이 경로의 주의 포인트</span>
                   <div className="flex flex-wrap gap-2">
-                    {currentRoute.hazards.map((hazard) => (
+                    {currentRoute.hazards.map((hazard: RouteOption["hazards"][0]) => (
                       <div key={hazard.id} className="flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1">
                         <HazardIcon type={hazard.icon} className="h-3.5 w-3.5 text-gray-600" />
                         <span className="text-xs text-gray-700">{hazard.label}</span>
@@ -1145,7 +1127,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
           </div>
         )}
 
-        <div className="absolute bottom-72 right-3 z-10 flex flex-col gap-2">
+        <div className="absolute bottom-52 right-3 z-10 flex flex-col gap-2">
           {/* 음성 안내 버튼 */}
           <button className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white shadow-md">
             <Mic className="h-5 w-5 text-gray-600" />
@@ -1159,7 +1141,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
         <div className="absolute bottom-4 left-0 right-0 z-20">
           {/* 필터 버튼들 */}
           <div className="mb-2 flex gap-2 px-3">
-            {routeFilters.map((filter) => {
+            {routeFilters.map((filter: RouteFilter) => {
               const isOrangeSafety = currentRoute.safetyLevel === "orange"
               return (
                 <button
@@ -1190,7 +1172,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
               scrollSnapType: "x mandatory",
             }}
           >
-            {currentRouteOptions.map((route, index) => {
+            {currentRouteOptions.map((route: RouteOption, index: number) => {
               const safetyColors = getSafetyColors(route.safetyLevel)
               return (
                 <div
@@ -1222,7 +1204,9 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
                       </div>
                       {/* 시간 및 거리 */}
                       <div className="mt-1.5 flex items-baseline gap-2">
-                        <span className={cn("text-4xl font-bold", safetyColors.text)}>{formatTime(route.time)}</span>
+                        <span className={cn("text-4xl font-bold", safetyColors.text)}>
+                          {selectedTransport === "walk" ? formatTime(route.time) : `${route.time}분`}
+                        </span>
                         <span className="text-lg text-gray-600">{route.distance}</span>
                       </div>
                       <div className="mt-2 flex items-center gap-3">
@@ -1250,7 +1234,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
 
                   {route.hazards.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-1.5 border-t border-gray-100 pt-3">
-                      {route.hazards.map((hazard) => (
+                      {route.hazards.map((hazard: RouteOption["hazards"][0]) => (
                         <div key={hazard.id} className="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5">
                           <HazardIcon type={hazard.icon} className="h-3 w-3 text-gray-600" />
                           <span className="text-xs text-gray-600">{hazard.label}</span>
@@ -1264,7 +1248,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
           </div>
 
           <div className="mt-2 flex justify-center gap-1.5">
-            {currentRouteOptions.map((route, index) => {
+            {currentRouteOptions.map((route: RouteOption, index: number) => {
               const colors = getSafetyColors(route.safetyLevel)
               return (
                 <div

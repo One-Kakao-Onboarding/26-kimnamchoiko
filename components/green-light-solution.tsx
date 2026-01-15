@@ -111,7 +111,7 @@ export default function GreenLightSolution({
           <div className="mb-6">
             <div className="mb-2 flex items-center gap-2">
               <div className="h-0.5 flex-1 bg-gray-200" />
-              <span className="text-xs font-semibold text-gray-500">회원님 맞춤 경로</span>
+              <span className="text-xs font-semibold text-gray-500">운전성향</span>
               <div className="h-0.5 flex-1 bg-gray-200" />
             </div>
             <div className="flex flex-wrap gap-2 justify-center">
