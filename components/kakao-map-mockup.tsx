@@ -25,7 +25,7 @@ import PedestrianSafetyAlert from "@/components/pedestrian-safety-alert"
 function CarIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z" />
+      <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z" />
     </svg>
   )
 }
@@ -109,6 +109,9 @@ const userDrivingHabits: DrivingHabitTag[] = [
   drivingHabitTags[0], // #눈길에도_조금빠름
   drivingHabitTags[1], // #급정거가_잦은편
 ]
+
+// 사용자 도보 성향 태그
+const userWalkingHabits = ["#빠른길_선호", "#빠른발걸음러"]
 
 const routeOptions: RouteOption[] = [
   // 위험 경로 (red)
@@ -259,6 +262,128 @@ const routeOptions: RouteOption[] = [
     },
   },
 ]
+
+// 도보 경로 옵션 (평균 2시간 10분, 9km)
+const walkRouteOptions: RouteOption[] = [
+  {
+    id: "walk-recommended",
+    label: "추천경로",
+    time: 137,
+    distance: "9.2km",
+    taxiFare: "약 1,240kcal",
+    mapImage: "/images/map_pangyo_2.png",
+    safetyLevel: "green",
+    impactScore: 90,
+    aiAnalysis: "보도가 잘 정비되어 있고 CCTV가 많은 경로",
+    personalizedMessage: "도착 예정 시간은 7분 늦어지지만, 가장 밝고 안전한 길입니다.",
+    drivingTip: "쾌적한 보행로로 스트레스 없이 걸으실 수 있어요",
+    hazards: [{ id: "cctv", label: "CCTV 밀집", icon: "cctv" }],
+    drivingHabitAnalysis: {
+      brakeScore: 90,
+      speedScore: 90,
+      recommendation: "보도가 잘 정비되어 있어 편하게 걸으실 수 있어요",
+    },
+  },
+  {
+    id: "walk-fastest",
+    label: "최단거리",
+    time: 120,
+    distance: "8.5km",
+    taxiFare: "약 1,150kcal",
+    mapImage: "/images/map_pangyo_1.png",
+    safetyLevel: "orange",
+    impactScore: 65,
+    aiAnalysis: "좁은 골목길 포함, 야간 이용 시 주의",
+    personalizedMessage: "최근 이 시간대에 인적이 드문 구간이 있었어요. 주변을 살피며 이동해 주세요.",
+    drivingTip: "조명이 어두운 구간이 있으니 시간대를 고려해주세요",
+    hazards: [
+      { id: "dark", label: "어두운 구간", icon: "dark" },
+      { id: "construction", label: "공사중", icon: "construction" },
+    ],
+    drivingHabitAnalysis: {
+      brakeScore: 65,
+      speedScore: 70,
+      recommendation: "골목길이 많아 주의가 필요해요",
+    },
+  },
+  {
+    id: "walk-main-road",
+    label: "큰길우선",
+    time: 140,
+    distance: "9.5km",
+    taxiFare: "약 1,280kcal",
+    mapImage: "/images/map_pangyo_3.png",
+    safetyLevel: "green",
+    impactScore: 85,
+    aiAnalysis: "대로변 위주로 밝고 안전한 경로",
+    personalizedMessage: "큰길로만 가니까 안심이에요! 사람들도 많이 다니고 가게들도 많아서 좋아요 🛣️",
+    drivingTip: "대로변이라 안전하지만 횡단보도가 많아 시간이 조금 더 걸려요",
+    hazards: [
+      { id: "cctv", label: "CCTV 밀집", icon: "cctv" },
+      { id: "crowd", label: "보행자 많음", icon: "crowd" },
+    ],
+    drivingHabitAnalysis: {
+      brakeScore: 85,
+      speedScore: 80,
+      recommendation: "대로변이라 안전하고 쾌적해요",
+    },
+  },
+  {
+    id: "walk-park",
+    label: "공원길",
+    time: 145,
+    distance: "9.8km",
+    taxiFare: "약 1,320kcal",
+    mapImage: "/images/map_pangyo_2.png",
+    safetyLevel: "green",
+    impactScore: 88,
+    aiAnalysis: "공원과 녹지를 경유하는 쾌적한 경로",
+    personalizedMessage: "날씨 좋을 때는 이 길이 최고예요! 공원 산책하면서 가실 수 있어요 🌳",
+    drivingTip: "공원길이라 경치도 좋고 공기도 맑아요",
+    hazards: [],
+    drivingHabitAnalysis: {
+      brakeScore: 88,
+      speedScore: 85,
+      recommendation: "공원길이라 여유롭게 걸으실 수 있어요",
+    },
+  },
+  {
+    id: "walk-dangerous",
+    label: "거리우선",
+    time: 108,
+    distance: "8.0km",
+    taxiFare: "약 1,080kcal",
+    warning: "최근 사건 이력",
+    mapImage: "/images/map_pangyo_1.png",
+    safetyLevel: "red",
+    impactScore: 45,
+    aiAnalysis: "최근 인근에서 범죄/소란 이력 존재",
+    personalizedMessage: "시간이 늦었으니, 오늘은 조금 돌아가더라도 사람들이 많이 다니는 대로변으로 가는 게 어때요?",
+    drivingTip: "이 시간대에는 다른 경로를 추천드려요",
+    hazards: [
+      { id: "dark", label: "어두운 구간", icon: "dark" },
+      { id: "construction", label: "인적 드묾", icon: "construction" },
+    ],
+    drivingHabitAnalysis: {
+      brakeScore: 45,
+      speedScore: 50,
+      recommendation: "안전을 위해 다른 경로를 선택하세요",
+    },
+  },
+]
+
+function formatTime(minutes: number): string {
+  const hours = Math.floor(minutes / 60)
+  const mins = minutes % 60
+
+  if (hours === 0) {
+    return `${mins}분`
+  } else if (mins === 0) {
+    return `${hours}시간`
+  } else {
+    return `${hours}시간 ${mins}분`
+  }
+}
 
 function getSafetyEmoji(level: RouteOption["safetyLevel"]) {
   switch (level) {
@@ -503,7 +628,16 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
     scrollToRoute(selectedRoute)
   }, [])
 
-  const currentRoute = routeOptions[selectedRoute]
+  // 선택된 교통수단에 따라 적절한 경로 옵션 선택
+  const currentRouteOptions = selectedTransport === "walk" ? walkRouteOptions : routeOptions
+
+  // 교통수단 변경 시 경로 선택 초기화
+  useEffect(() => {
+    setSelectedRoute(0)
+    scrollToRoute(0)
+  }, [selectedTransport])
+
+  const currentRoute = currentRouteOptions[selectedRoute]
   const currentSafetyColors = getSafetyColors(currentRoute.safetyLevel)
 
   // Red Light Warning 수락 핸들러
@@ -511,7 +645,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
     setShowRedLightWarning(false)
     // Green Light Solution 패널은 표시하지 않음
     // 추천 경로로 자동 전환 (내비추천)
-    const recommendedIndex = routeOptions.findIndex((r) => r.id === "recommended")
+    const recommendedIndex = currentRouteOptions.findIndex((r) => r.id === "recommended" || r.id === "walk-recommended")
     if (recommendedIndex !== -1) {
       setSelectedRoute(recommendedIndex)
       scrollToRoute(recommendedIndex)
@@ -540,35 +674,66 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
         onClose={() => setShowRedLightWarning(false)}
         onAcceptSafeRoute={handleAcceptSafeRoute}
         userName="그림"
-        drivingHabitTag={userDrivingHabits.map((h) => h.label).join(", ")}
-        drivingHabitTags={userDrivingHabits}
+        drivingHabitTag={
+          selectedTransport === "walk"
+            ? userWalkingHabits.join(", ")
+            : userDrivingHabits.map((h) => h.label).join(", ")
+        }
+        drivingHabitTags={selectedTransport === "walk" ? undefined : userDrivingHabits}
         warningMessage={
-          currentRoute.safetyLevel === "red"
-            ? "눈 오는 날 주행 속도가 여전히 조금 빨라요!"
-            : currentRoute.safetyLevel === "orange" ?
-            "오늘은 평소보다 조금 더 조심하면 좋아요." : "오늘은 이 길도 좋은 선택이에요!"
+          selectedTransport === "walk"
+            ? currentRoute.safetyLevel === "red"
+              ? "이 길 인근에서 최근 좋지 않은 사건(범죄/소란) 이력이 있어요!"
+              : "이 시간대에는 조금 더 조심하면 좋아요."
+            : currentRoute.safetyLevel === "red"
+              ? "눈 오는 날 주행 속도가 여전히 조금 빨라요!"
+              : "오늘은 평소보다 조금 더 조심하면 좋아요."
         }
         contextMessage={currentRoute.personalizedMessage}
         safetyLevel={currentRoute.safetyLevel === "orange" ? "orange" : "red"}
-        newsArticles={[
-          {
-            title: currentRoute.safetyLevel === "red"
-              ? "[속보] 서해안고속도로 추돌 사고... \"도로 결빙 주의 필요\""
-              : currentRoute.safetyLevel === "orange"
-              ? "[속보] 출근 시간대 도로 결빙 사고 증가"
-              : "[속보] 서해안고속도로 추돌 사고… \"도로 결빙 주의 필요\"",
-            source: "KBS 뉴스",
-            thumbnail: "/images/news-placeholder.jpg",
-            url: "#",
-            publishedAt: "2시간 전",
-          },
-          {
-            title: "경기 용인·수지 일대 도로 곳곳 결빙 주의보",
-            source: "연합뉴스",
-            url: "#",
-            publishedAt: "4시간 전",
-          },
-        ]}
+        isWalkMode={selectedTransport === "walk"}
+        newsArticles={
+          selectedTransport === "walk"
+            ? [
+                {
+                  title:
+                    currentRoute.safetyLevel === "red"
+                      ? "[단독] 서울 강남구 일대 야간 소란 사건 발생"
+                      : "서울시 야간 보행 안전 대책 강화",
+                  source: currentRoute.safetyLevel === "red" ? "YTN" : "뉴스1",
+                  thumbnail: "/images/news-placeholder.jpg",
+                  url: "#",
+                  publishedAt: "3시간 전",
+                },
+                {
+                  title:
+                    currentRoute.safetyLevel === "red"
+                      ? "경기 용인·수지 일대 범죄 주의보"
+                      : "최근 야간 시간대 소란 신고 증가",
+                  source: "연합뉴스",
+                  url: "#",
+                  publishedAt: "5시간 전",
+                },
+              ]
+            : [
+                {
+                  title:
+                    currentRoute.safetyLevel === "red"
+                      ? "[속보] 서해안고속도로 추돌 사고... \"도로 결빙 주의 필요\""
+                      : "[속보] 출근 시간대 도로 결빙 사고 증가",
+                  source: "KBS 뉴스",
+                  thumbnail: "/images/news-placeholder.jpg",
+                  url: "#",
+                  publishedAt: "2시간 전",
+                },
+                {
+                  title: "경기 용인·수지 일대 도로 곳곳 결빙 주의보",
+                  source: "연합뉴스",
+                  url: "#",
+                  publishedAt: "4시간 전",
+                },
+              ]
+        }
       />
 
       {/* Green Light Solution 모달 */}
@@ -578,12 +743,13 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
         onStartNavigation={handleStartNavigation}
         userName="그림"
         routeName={currentRoute.label}
-        solutionMessage="좋은 선택이에요!"
+        solutionMessage="그림님 이 길도 좋은 선택이에요!"
         reasoningMessage={currentRoute.personalizedMessage}
-        userTags={userDrivingHabits.map((h) => h.label)}
+        userTags={selectedTransport === "walk" ? userWalkingHabits : userDrivingHabits.map((h) => h.label)}
         estimatedTime={currentRoute.time}
         distance={currentRoute.distance}
         safetyScore={currentRoute.impactScore}
+        isWalkMode={selectedTransport === "walk"}
       />
 
       {/* 보행자 안심 귀가 알림 */}
@@ -689,7 +855,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
       {/* 지도 영역 */}
       <div className="absolute inset-0 top-[124px] w-full overflow-hidden">
         <div className="absolute inset-0 bg-[#f8f5f0]">
-          {routeOptions.map((route, index) => (
+          {currentRouteOptions.map((route, index) => (
             <img
               key={route.id}
               src={route.mapImage || "/placeholder.svg"}
@@ -723,22 +889,13 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
                 // AI 분석 패널 숨기기
                 setShowAIAnalysis(false)
                 // 현재 경로의 안전도에 따라 적절한 시트 표시
-                if (selectedTransport === "car") {
-                  const currentSafetyLevel = routeOptions[selectedRoute].safetyLevel
-                  if (currentSafetyLevel === "red") {
-                    setShowRedLightWarning(true)
-                  } else if (currentSafetyLevel === "orange") {
-                    // 주의 시트 표시 (아직 RedLightWarning 사용)
-                    setShowRedLightWarning(true)
-                  } else {
-                    // 안전 시트 표시 (GreenLightSolution 사용)
-                    setShowGreenLightSolution(true)
-                  }
-                } else if (selectedTransport === "walk") {
-                  const currentHour = new Date().getHours()
-                  if (currentHour >= 21 || currentHour < 6) {
-                    setShowPedestrianSafetyAlert(true)
-                  }
+                const currentSafetyLevel = currentRouteOptions[selectedRoute].safetyLevel
+                if (currentSafetyLevel === "red") {
+                  setShowRedLightWarning(true)
+                } else if (currentSafetyLevel === "orange") {
+                  setShowRedLightWarning(true)
+                } else {
+                  setShowGreenLightSolution(true)
                 }
               }}
               className={cn(
@@ -792,17 +949,42 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
                       {getSafetyPersonalLabel(currentRoute.safetyLevel)}
                     </h3>
                   </div>
-                  <p className="text-xs text-gray-500 mt-0.5">회원님의 운전 스타일을 분석했어요</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {selectedTransport === "walk"
+                      ? "그림님의 이동 패턴을 분석하여, 가장 안전하고 편안한 경로를 추천드렸어요."
+                      : "회원님의 운전 스타일을 분석했어요"}
+                  </p>
                 </div>
                 <TrafficLightIndicator level={currentRoute.safetyLevel} />
               </div>
 
-              {/* 사용자 운전 습관 태그 표시 */}
+              {/* 사용자 운전 습관/도보 성향 태그 표시 */}
               {selectedTransport === "car" && userDrivingHabits.length > 0 && (
-                <div className="mb-4 rounded-xl bg-amber-50 border border-amber-200 p-3">
+                <div className={cn(
+                  "mb-4 rounded-xl p-3",
+                  currentRoute.safetyLevel === "red"
+                    ? "bg-red-50 border border-red-200"
+                    : currentRoute.safetyLevel === "orange"
+                      ? "bg-amber-50 border border-amber-200"
+                      : "bg-emerald-50 border border-emerald-200"
+                )}>
                   <div className="flex items-center gap-2 mb-2">
-                    <Shield className="h-4 w-4 text-amber-600" />
-                    <span className="text-xs font-semibold text-amber-900">회원님의 운전 성향</span>
+                    <Shield className={cn(
+                      "h-4 w-4",
+                      currentRoute.safetyLevel === "red"
+                        ? "text-red-600"
+                        : currentRoute.safetyLevel === "orange"
+                          ? "text-amber-600"
+                          : "text-emerald-600"
+                    )} />
+                    <span className={cn(
+                      "text-xs font-semibold",
+                      currentRoute.safetyLevel === "red"
+                        ? "text-red-900"
+                        : currentRoute.safetyLevel === "orange"
+                          ? "text-amber-900"
+                          : "text-emerald-900"
+                    )}>회원님의 운전 성향</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {userDrivingHabits.map((habit) => (
@@ -811,7 +993,9 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
                         className={cn(
                           "rounded-full px-2.5 py-1 text-xs font-medium",
                           habit.type === "bad"
-                            ? "bg-red-100 text-red-700"
+                            ? currentRoute.safetyLevel === "red"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-amber-100 text-amber-700"
                             : "bg-emerald-100 text-emerald-700"
                         )}
                       >
@@ -819,8 +1003,73 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-amber-700 mt-2 leading-relaxed">
+                  <p className={cn(
+                    "text-xs mt-2 leading-relaxed",
+                    currentRoute.safetyLevel === "red"
+                      ? "text-red-700"
+                      : currentRoute.safetyLevel === "orange"
+                        ? "text-amber-700"
+                        : "text-emerald-700"
+                  )}>
                     이 습관들을 고려하여 안전한 경로를 추천해드려요
+                  </p>
+                </div>
+              )}
+
+              {/* 도보 성향 태그 표시 */}
+              {selectedTransport === "walk" && userWalkingHabits.length > 0 && (
+                <div className={cn(
+                  "mb-4 rounded-xl p-3",
+                  currentRoute.safetyLevel === "red"
+                    ? "bg-red-50 border border-red-200"
+                    : currentRoute.safetyLevel === "orange"
+                      ? "bg-amber-50 border border-amber-200"
+                      : "bg-emerald-50 border border-emerald-200"
+                )}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Shield className={cn(
+                      "h-4 w-4",
+                      currentRoute.safetyLevel === "red"
+                        ? "text-red-600"
+                        : currentRoute.safetyLevel === "orange"
+                          ? "text-amber-600"
+                          : "text-emerald-600"
+                    )} />
+                    <span className={cn(
+                      "text-xs font-semibold",
+                      currentRoute.safetyLevel === "red"
+                        ? "text-red-900"
+                        : currentRoute.safetyLevel === "orange"
+                          ? "text-amber-900"
+                          : "text-emerald-900"
+                    )}>회원님의 도보 성향</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {userWalkingHabits.map((habit) => (
+                      <div
+                        key={habit}
+                        className={cn(
+                          "rounded-full px-2.5 py-1 text-xs font-medium",
+                          currentRoute.safetyLevel === "red"
+                            ? "bg-red-100 text-red-700"
+                            : currentRoute.safetyLevel === "orange"
+                              ? "bg-amber-100 text-amber-700"
+                              : "bg-blue-100 text-blue-700"
+                        )}
+                      >
+                        {habit}
+                      </div>
+                    ))}
+                  </div>
+                  <p className={cn(
+                    "text-xs mt-2 leading-relaxed",
+                    currentRoute.safetyLevel === "red"
+                      ? "text-red-700"
+                      : currentRoute.safetyLevel === "orange"
+                        ? "text-amber-700"
+                        : "text-emerald-700"
+                  )}>
+                    이 성향을 고려하여 안전한 경로를 추천해드려요
                   </p>
                 </div>
               )}
@@ -832,15 +1081,17 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
                 </p>
               </div>
 
-              {/* 운전 습관 기반 분석 */}
+              {/* 운전 습관 / 도보 분석 */}
               <div className="bg-gray-50 rounded-xl p-3.5 mb-4">
                 <div className="flex items-center gap-2 mb-3">
                   <TrendingUp className="h-4 w-4 text-gray-600" />
-                  <span className="text-xs font-semibold text-gray-700">회원님의 운전 습관 분석</span>
+                  <span className="text-xs font-semibold text-gray-700">
+                    {selectedTransport === "walk" ? "경로 안전 분석" : "회원님의 운전 습관 분석"}
+                  </span>
                 </div>
                 <div className="space-y-2 mb-3">
                   <DrivingHabitBar
-                    label="급정거"
+                    label={selectedTransport === "walk" ? "조명밝기" : "급정거"}
                     score={currentRoute.drivingHabitAnalysis.brakeScore}
                     color={
                       currentRoute.drivingHabitAnalysis.brakeScore >= 80
@@ -851,7 +1102,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
                     }
                   />
                   <DrivingHabitBar
-                    label="속도유지"
+                    label={selectedTransport === "walk" ? "인적빈도" : "속도유지"}
                     score={currentRoute.drivingHabitAnalysis.speedScore}
                     color={
                       currentRoute.drivingHabitAnalysis.speedScore >= 80
@@ -894,7 +1145,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
           </div>
         )}
 
-        <div className="absolute bottom-52 right-3 z-10 flex flex-col gap-2">
+        <div className="absolute bottom-72 right-3 z-10 flex flex-col gap-2">
           {/* 음성 안내 버튼 */}
           <button className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white shadow-md">
             <Mic className="h-5 w-5 text-gray-600" />
@@ -939,7 +1190,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
               scrollSnapType: "x mandatory",
             }}
           >
-            {routeOptions.map((route, index) => {
+            {currentRouteOptions.map((route, index) => {
               const safetyColors = getSafetyColors(route.safetyLevel)
               return (
                 <div
@@ -971,15 +1222,17 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
                       </div>
                       {/* 시간 및 거리 */}
                       <div className="mt-1.5 flex items-baseline gap-2">
-                        <span className={cn("text-4xl font-bold", safetyColors.text)}>{route.time}분</span>
+                        <span className={cn("text-4xl font-bold", safetyColors.text)}>{formatTime(route.time)}</span>
                         <span className="text-lg text-gray-600">{route.distance}</span>
                       </div>
                       <div className="mt-2 flex items-center gap-3">
                         <span className="text-xs text-gray-500">안전지수</span>
                         <ImpactScoreGauge score={route.impactScore} level={route.safetyLevel} />
                       </div>
-                      {/* 택시비 */}
-                      <span className="mt-1 text-sm text-gray-500">택시비 약 {route.taxiFare}~</span>
+                      {/* 택시비/칼로리 */}
+                      <span className="mt-1 text-sm text-gray-500">
+                        {selectedTransport === "walk" ? route.taxiFare : `택시비 약 ${route.taxiFare}~`}
+                      </span>
                     </div>
 
                     <button
@@ -1011,7 +1264,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
           </div>
 
           <div className="mt-2 flex justify-center gap-1.5">
-            {routeOptions.map((route, index) => {
+            {currentRouteOptions.map((route, index) => {
               const colors = getSafetyColors(route.safetyLevel)
               return (
                 <div

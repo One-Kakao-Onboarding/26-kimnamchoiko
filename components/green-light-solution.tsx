@@ -16,6 +16,7 @@ interface GreenLightSolutionProps {
   estimatedTime: number
   distance: string
   safetyScore: number
+  isWalkMode?: boolean
 }
 
 export default function GreenLightSolution({
@@ -30,8 +31,23 @@ export default function GreenLightSolution({
   estimatedTime,
   distance,
   safetyScore,
+  isWalkMode = false,
 }: GreenLightSolutionProps) {
   if (!isOpen) return null
+
+  // 시간 포맷팅 함수
+  function formatTime(minutes: number): string {
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+
+    if (hours === 0) {
+      return `${mins}분`
+    } else if (mins === 0) {
+      return `${hours}시간`
+    } else {
+      return `${hours}시간 ${mins}분`
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -81,7 +97,7 @@ export default function GreenLightSolution({
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-emerald-600" />
-                <span className="text-2xl font-bold text-emerald-900">{estimatedTime}분</span>
+                <span className="text-2xl font-bold text-emerald-900">{formatTime(estimatedTime)}</span>
               </div>
               <div className="h-6 w-px bg-emerald-300" />
               <div className="flex items-center gap-2">
@@ -124,7 +140,7 @@ export default function GreenLightSolution({
               <div className="flex-1">
                 <h4 className="mb-1 font-bold text-emerald-900">안심하고 가세요!</h4>
                 <p className="text-xs leading-relaxed text-emerald-700">
-                  {userName}님의 운전 스타일을 분석하여, 가장 안전하고 편안한 경로를 추천드렸어요.
+                  {userName}님의 {isWalkMode ? "이동 패턴" : "운전 스타일"}을 분석하여, 가장 안전하고 편안한 경로를 추천드렸어요.
                 </p>
               </div>
             </div>

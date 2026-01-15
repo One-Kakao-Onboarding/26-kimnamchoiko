@@ -29,6 +29,7 @@ interface RedLightWarningProps {
   contextMessage: string
   newsArticles: NewsArticle[]
   safetyLevel?: "red" | "orange" // 안전도 레벨 추가
+  isWalkMode?: boolean // 도보 모드 여부
 }
 
 export default function RedLightWarning({
@@ -42,6 +43,7 @@ export default function RedLightWarning({
   contextMessage,
   newsArticles,
   safetyLevel = "red",
+  isWalkMode = false,
 }: RedLightWarningProps) {
   if (!isOpen) return null
 
@@ -99,7 +101,9 @@ export default function RedLightWarning({
 
           {/* 운전 습관 태그 표시 */}
           <div className="mb-4">
-            <span className="text-xs text-gray-500 mb-2 block">회원님의 운전 성향:</span>
+            <span className="text-xs text-gray-500 mb-2 block">
+              회원님의 {isWalkMode ? "도보 성향" : "운전 성향"}:
+            </span>
             <div className="flex flex-wrap gap-2">
               {drivingHabitTags && drivingHabitTags.length > 0 ? (
                 drivingHabitTags.map((tag) => (
@@ -108,7 +112,9 @@ export default function RedLightWarning({
                     className={cn(
                       "rounded-full px-3 py-1 text-xs font-medium",
                       tag.type === "bad"
-                        ? "bg-red-100 text-red-700"
+                        ? safetyLevel === "red"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-amber-100 text-amber-700"
                         : "bg-emerald-100 text-emerald-700"
                     )}
                   >
@@ -116,7 +122,12 @@ export default function RedLightWarning({
                   </div>
                 ))
               ) : (
-                <div className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">
+                <div className={cn(
+                  "rounded-full px-3 py-1 text-xs font-medium",
+                  safetyLevel === "red"
+                    ? "bg-red-100 text-red-700"
+                    : "bg-amber-100 text-amber-700"
+                )}>
                   {drivingHabitTag}
                 </div>
               )}
@@ -175,7 +186,7 @@ export default function RedLightWarning({
 
           {/* 안내 문구 */}
           <p className="mt-4 text-center text-xs text-gray-400">
-            AI가 회원님의 운전 습관과 실시간 상황을 분석했어요
+            AI가 회원님의 {isWalkMode ? "이동 패턴" : "운전 습관"}과 실시간 상황을 분석했어요
           </p>
         </div>
       </div>
