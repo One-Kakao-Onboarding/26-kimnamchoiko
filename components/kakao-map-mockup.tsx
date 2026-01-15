@@ -119,7 +119,7 @@ const routeOptions: RouteOption[] = [
     distance: "9km",
     taxiFare: "16,900원",
     warning: "어린이 보호구역 포함",
-    mapImage: "/images/kakaotalk-photo-2026-01-15-11-57-16-20003.jpeg",
+    mapImage: "/images/map_pangyo_1.png",
     safetyLevel: "red",
     impactScore: 45,
     aiAnalysis: "어린이 보호구역 3곳 통과, 주의 필요",
@@ -142,7 +142,7 @@ const routeOptions: RouteOption[] = [
     time: 22,
     distance: "11.3km",
     taxiFare: "17,000원",
-    mapImage: "/images/map_pangyo_1.png",
+    mapImage: "/images/map_pangyo_2.png",
     safetyLevel: "orange",
     impactScore: 65,
     aiAnalysis: "서판교IC 구간 결빙 주의",
@@ -164,7 +164,7 @@ const routeOptions: RouteOption[] = [
     time: 22,
     distance: "11.3km",
     taxiFare: "17,000원",
-    mapImage: "/images/kakaotalk-photo-2026-01-15-11-57-17-20004.jpeg",
+    mapImage: "/images/map_pangyo_3.png",
     safetyLevel: "orange",
     impactScore: 70,
     aiAnalysis: "경부고속도로 정체 구간 존재",
@@ -180,7 +180,7 @@ const routeOptions: RouteOption[] = [
   // 안전 경로 (green)
   {
     id: "recommended",
-    label: "내비추천",
+    label: "카맵 지킴이 추천",
     time: 22,
     distance: "10.7km",
     taxiFare: "17,300원",
@@ -692,7 +692,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
                 "absolute inset-0 h-full w-full object-cover transition-opacity duration-300",
                 selectedRoute === index ? "opacity-100" : "opacity-0",
               )}
-              style={{ objectPosition: "center 35%" }}
+              style={{ objectPosition: "center 80%" }}
             />
           ))}
         </div>
@@ -740,7 +740,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
                 showAIAnalysis ? "border-[#4A90E2] bg-[#4A90E2] text-white" : "border-gray-200 bg-white text-gray-600",
               )}
             >
-              <Shield className="h-5 w-5" />
+              <span className="text-2xl">🚦</span>
             </button>
 
             {/* 안전도 말풍선 메시지 */}
