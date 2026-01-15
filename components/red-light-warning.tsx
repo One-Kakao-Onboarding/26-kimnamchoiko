@@ -12,12 +12,19 @@ interface NewsArticle {
   publishedAt: string
 }
 
+interface DrivingHabitTag {
+  id: string
+  label: string
+  type: "bad" | "good"
+}
+
 interface RedLightWarningProps {
   isOpen: boolean
   onClose: () => void
   onAcceptSafeRoute: () => void
   userName?: string
   drivingHabitTag: string
+  drivingHabitTags?: DrivingHabitTag[] // 개별 태그 배열 추가
   warningMessage: string
   contextMessage: string
   newsArticles: NewsArticle[]
@@ -30,6 +37,7 @@ export default function RedLightWarning({
   onAcceptSafeRoute,
   userName = "회원",
   drivingHabitTag,
+  drivingHabitTags,
   warningMessage,
   contextMessage,
   newsArticles,
@@ -90,10 +98,28 @@ export default function RedLightWarning({
           </div>
 
           {/* 운전 습관 태그 표시 */}
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-xs text-gray-500">회원님의 운전 성향:</span>
-            <div className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">
-              {drivingHabitTag}
+          <div className="mb-4">
+            <span className="text-xs text-gray-500 mb-2 block">회원님의 운전 성향:</span>
+            <div className="flex flex-wrap gap-2">
+              {drivingHabitTags && drivingHabitTags.length > 0 ? (
+                drivingHabitTags.map((tag) => (
+                  <div
+                    key={tag.id}
+                    className={cn(
+                      "rounded-full px-3 py-1 text-xs font-medium",
+                      tag.type === "bad"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-emerald-100 text-emerald-700"
+                    )}
+                  >
+                    {tag.label}
+                  </div>
+                ))
+              ) : (
+                <div className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">
+                  {drivingHabitTag}
+                </div>
+              )}
             </div>
           </div>
 
@@ -114,13 +140,6 @@ export default function RedLightWarning({
                   rel="noopener noreferrer"
                   className="group flex gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 transition-all hover:border-red-300 hover:bg-red-50"
                 >
-                  {article.thumbnail && (
-                    <img
-                      src={article.thumbnail}
-                      alt={article.title}
-                      className="h-16 w-16 rounded-lg object-cover"
-                    />
-                  )}
                   <div className="flex-1">
                     <p className="line-clamp-2 text-sm font-medium text-gray-900 group-hover:text-red-700">
                       {article.title}

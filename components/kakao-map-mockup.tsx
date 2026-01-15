@@ -541,6 +541,7 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
         onAcceptSafeRoute={handleAcceptSafeRoute}
         userName="그림"
         drivingHabitTag={userDrivingHabits.map((h) => h.label).join(", ")}
+        drivingHabitTags={userDrivingHabits}
         warningMessage={
           currentRoute.safetyLevel === "red"
             ? "눈 오는 날 주행 속도가 여전히 조금 빨라요!"
