@@ -36,10 +36,10 @@ export default function RedLightWarning({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative mx-4 w-full max-w-md animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="absolute bottom-0 left-0 right-0 mx-auto w-full max-w-[430px] animate-in slide-in-from-bottom duration-300">
         {/* 빨간 신호등 헤더 */}
-        <div className="rounded-t-3xl bg-gradient-to-br from-red-500 to-red-600 px-6 py-8 text-white shadow-2xl">
+        <div className="rounded-t-3xl bg-gradient-to-br from-red-500 to-red-600 px-6 py-6 text-white shadow-2xl">
           <button
             onClick={onClose}
             className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition-colors hover:bg-white/30"
@@ -48,18 +48,18 @@ export default function RedLightWarning({
           </button>
 
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-              <div className="h-12 w-12 animate-pulse rounded-full bg-red-300" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+              <div className="h-10 w-10 animate-pulse rounded-full bg-red-300" />
             </div>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold">🔴 위험 감지</h2>
-              <p className="mt-1 text-sm text-red-100">Red Light</p>
+              <h2 className="text-xl font-bold">🔴 위험 감지</h2>
+              <p className="mt-0.5 text-xs text-red-100">Red Light</p>
             </div>
           </div>
         </div>
 
         {/* 컨텐츠 영역 */}
-        <div className="rounded-b-3xl bg-white px-6 py-6 shadow-2xl">
+        <div className="bg-white px-6 py-6 shadow-2xl max-h-[60vh] overflow-y-auto">
           {/* 사용자 맞춤 경고 메시지 */}
           <div className="mb-4">
             <div className="mb-2 flex items-center gap-2">

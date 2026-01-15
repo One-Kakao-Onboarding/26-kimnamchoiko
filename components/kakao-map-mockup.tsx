@@ -660,20 +660,15 @@ export default function KakaoMapMockup() {
           <div className="relative">
             <button
               onClick={() => {
-                // AI 분석 패널을 토글
-                if (!showAIAnalysis) {
-                  // 패널을 열 때는 그냥 열기만
-                  setShowAIAnalysis(true)
-                } else {
-                  // 패널을 닫을 때는 런칭 팝업(경고 모달) 표시
-                  setShowAIAnalysis(false)
-                  if (selectedTransport === "car") {
-                    setShowRedLightWarning(true)
-                  } else if (selectedTransport === "walk") {
-                    const currentHour = new Date().getHours()
-                    if (currentHour >= 21 || currentHour < 6) {
-                      setShowPedestrianSafetyAlert(true)
-                    }
+                // AI 분석 패널 숨기기
+                setShowAIAnalysis(false)
+                // 런칭 팝업 표시
+                if (selectedTransport === "car") {
+                  setShowRedLightWarning(true)
+                } else if (selectedTransport === "walk") {
+                  const currentHour = new Date().getHours()
+                  if (currentHour >= 21 || currentHour < 6) {
+                    setShowPedestrianSafetyAlert(true)
                   }
                 }
               }}
