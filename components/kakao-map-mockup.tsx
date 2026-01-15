@@ -492,8 +492,13 @@ export default function KakaoMapMockup() {
         onAcceptSafeRoute={handleAcceptSafeRoute}
         userName="그림"
         drivingHabitTag={userDrivingHabits.map((h) => h.label).join(", ")}
-        warningMessage="눈 오는 날 주행 속도가 여전히 조금 빨라요!"
-        contextMessage="오늘은 어제 폭설로 인해 그림님의 평소 경로에 블랙아이스 위험이 매우 높습니다."
+        warningMessage={
+          currentRoute.safetyLevel === "red"
+            ? "이 경로는 위험 요소가 많아요!"
+            : "조금만 주의하시면 좋겠어요!"
+        }
+        contextMessage={currentRoute.personalizedMessage}
+        safetyLevel={currentRoute.safetyLevel === "orange" ? "orange" : "red"}
         newsArticles={[
           {
             title: "[속보] 어젯밤 서해안고속도로 30중 추돌... '블랙아이스가 원인'",
@@ -517,13 +522,13 @@ export default function KakaoMapMockup() {
         onClose={() => setShowGreenLightSolution(false)}
         onStartNavigation={handleStartNavigation}
         userName="그림"
-        routeName="내비추천 경로"
-        solutionMessage="제가 딱 추천하고 싶은 경로예요!"
-        reasoningMessage="사고 구간을 피해, 제설 작업이 완료된 큰 도로 위주로 안내합니다. 5분 더 걸리지만 훨씬 안전해요."
-        userTags={[...userDrivingHabits.map((h) => h.label), "#방어운전_만렙"]}
-        estimatedTime={22}
-        distance="10.7km"
-        safetyScore={85}
+        routeName={currentRoute.label}
+        solutionMessage="좋은 선택이에요!"
+        reasoningMessage={currentRoute.personalizedMessage}
+        userTags={userDrivingHabits.map((h) => h.label)}
+        estimatedTime={currentRoute.time}
+        distance={currentRoute.distance}
+        safetyScore={currentRoute.impactScore}
       />
 
       {/* 보행자 안심 귀가 알림 */}
@@ -662,9 +667,18 @@ export default function KakaoMapMockup() {
               onClick={() => {
                 // AI 분석 패널 숨기기
                 setShowAIAnalysis(false)
-                // 런칭 팝업 표시
+                // 현재 경로의 안전도에 따라 적절한 시트 표시
                 if (selectedTransport === "car") {
-                  setShowRedLightWarning(true)
+                  const currentSafetyLevel = routeOptions[selectedRoute].safetyLevel
+                  if (currentSafetyLevel === "red") {
+                    setShowRedLightWarning(true)
+                  } else if (currentSafetyLevel === "orange") {
+                    // 주의 시트 표시 (아직 RedLightWarning 사용)
+                    setShowRedLightWarning(true)
+                  } else {
+                    // 안전 시트 표시 (GreenLightSolution 사용)
+                    setShowGreenLightSolution(true)
+                  }
                 } else if (selectedTransport === "walk") {
                   const currentHour = new Date().getHours()
                   if (currentHour >= 21 || currentHour < 6) {
@@ -690,9 +704,9 @@ export default function KakaoMapMockup() {
                   currentRoute.safetyLevel === "red" && "bg-red-500"
                 )}>
                   <p className="text-xs font-bold text-white">
-                    {currentRoute.safetyLevel === "green" && "✓ 안전한 경로예요"}
+                    {currentRoute.safetyLevel === "green" && "✓ 좋은 선택이에요!"}
                     {currentRoute.safetyLevel === "orange" && "⚠ 주의가 필요해요"}
-                    {currentRoute.safetyLevel === "red" && "⚡ 위험해요!"}
+                    {currentRoute.safetyLevel === "red" && "⚡ 오늘은 위험할 것 같아요!"}
                   </p>
                   {/* 말풍선 꼬리 */}
                   <div className={cn(

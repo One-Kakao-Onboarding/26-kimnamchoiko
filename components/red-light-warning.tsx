@@ -21,6 +21,7 @@ interface RedLightWarningProps {
   warningMessage: string
   contextMessage: string
   newsArticles: NewsArticle[]
+  safetyLevel?: "red" | "orange" // 안전도 레벨 추가
 }
 
 export default function RedLightWarning({
@@ -32,14 +33,29 @@ export default function RedLightWarning({
   warningMessage,
   contextMessage,
   newsArticles,
+  safetyLevel = "red",
 }: RedLightWarningProps) {
   if (!isOpen) return null
+
+  // 안전도 레벨에 따른 색상 및 텍스트
+  const isOrange = safetyLevel === "orange"
+  const headerColors = isOrange
+    ? "from-amber-500 to-amber-600"
+    : "from-red-500 to-red-600"
+  const headerIcon = isOrange ? "🟡" : "🔴"
+  const headerTitle = isOrange ? "주의 필요" : "위험 감지"
+  const headerSubtitle = isOrange ? "Orange Light" : "Red Light"
+  const iconBg = isOrange ? "bg-amber-300" : "bg-red-300"
+  const iconColor = isOrange ? "text-amber-500" : "text-red-500"
+  const messageBg = isOrange ? "bg-amber-50" : "bg-red-50"
+  const messageText = isOrange ? "text-amber-700" : "text-red-700"
+  const headerTextColor = isOrange ? "text-amber-100" : "text-red-100"
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="absolute bottom-0 left-0 right-0 mx-auto w-full max-w-[430px] animate-in slide-in-from-bottom duration-300">
-        {/* 빨간 신호등 헤더 */}
-        <div className="rounded-t-3xl bg-gradient-to-br from-red-500 to-red-600 px-6 py-6 text-white shadow-2xl">
+        {/* 신호등 헤더 */}
+        <div className={cn("rounded-t-3xl bg-gradient-to-br px-6 py-6 text-white shadow-2xl", headerColors)}>
           <button
             onClick={onClose}
             className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition-colors hover:bg-white/30"
@@ -49,11 +65,11 @@ export default function RedLightWarning({
 
           <div className="flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-              <div className="h-10 w-10 animate-pulse rounded-full bg-red-300" />
+              <div className={cn("h-10 w-10 animate-pulse rounded-full", iconBg)} />
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold">🔴 위험 감지</h2>
-              <p className="mt-0.5 text-xs text-red-100">Red Light</p>
+              <h2 className="text-xl font-bold">{headerIcon} {headerTitle}</h2>
+              <p className={cn("mt-0.5 text-xs", headerTextColor)}>{headerSubtitle}</p>
             </div>
           </div>
         </div>
@@ -63,13 +79,13 @@ export default function RedLightWarning({
           {/* 사용자 맞춤 경고 메시지 */}
           <div className="mb-4">
             <div className="mb-2 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-red-500" />
+              <AlertTriangle className={cn("h-5 w-5", iconColor)} />
               <h3 className="font-bold text-gray-900">
                 {userName}님, {warningMessage}
               </h3>
             </div>
-            <div className="rounded-xl bg-red-50 p-4">
-              <p className="text-sm leading-relaxed text-red-700">{contextMessage}</p>
+            <div className={cn("rounded-xl p-4", messageBg)}>
+              <p className={cn("text-sm leading-relaxed", messageText)}>{contextMessage}</p>
             </div>
           </div>
 
