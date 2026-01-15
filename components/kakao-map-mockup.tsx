@@ -111,6 +111,31 @@ const userDrivingHabits: DrivingHabitTag[] = [
 ]
 
 const routeOptions: RouteOption[] = [
+  // 위험 경로 (red)
+  {
+    id: "shortest",
+    label: "거리우선",
+    time: 27,
+    distance: "9km",
+    taxiFare: "16,900원",
+    warning: "어린이 보호구역 포함",
+    mapImage: "/images/kakaotalk-photo-2026-01-15-11-57-16-20003.jpeg",
+    safetyLevel: "red",
+    impactScore: 45,
+    aiAnalysis: "어린이 보호구역 3곳 통과, 주의 필요",
+    personalizedMessage: "가장 짧은 길인데... 스쿨존이 3군데나 있어요. 조심조심 가주세요! 🚸",
+    drivingTip: "30km/h 제한구간이 많아요. 시간 여유 있으실 때 추천드려요",
+    hazards: [
+      { id: "school", label: "스쿨존", icon: "school" },
+      { id: "construction", label: "공사중", icon: "construction" },
+    ],
+    drivingHabitAnalysis: {
+      brakeScore: 55,
+      speedScore: 50,
+      recommendation: "스쿨존에서 속도 조절이 중요해요. 평소보다 더 천천히 가주세요",
+    },
+  },
+  // 주의 경로 (orange)
   {
     id: "fastest",
     label: "최소시간",
@@ -133,6 +158,26 @@ const routeOptions: RouteOption[] = [
       recommendation: "급가속 습관이 있으시네요. 이 경로에선 부드러운 출발이 안전해요",
     },
   },
+  {
+    id: "highway",
+    label: "고속도로우선",
+    time: 22,
+    distance: "11.3km",
+    taxiFare: "17,000원",
+    mapImage: "/images/kakaotalk-photo-2026-01-15-11-57-17-20004.jpeg",
+    safetyLevel: "orange",
+    impactScore: 70,
+    aiAnalysis: "경부고속도로 정체 구간 존재",
+    personalizedMessage: "지금 경부고속도로가 조금 막혀요. 그래도 괜찮으시다면 이 길도 나쁘지 않아요 🚗",
+    drivingTip: "정체 구간에서 자주 끼어들기가 있으니 여유롭게 가세요",
+    hazards: [{ id: "crowd", label: "정체구간", icon: "crowd" }],
+    drivingHabitAnalysis: {
+      brakeScore: 70,
+      speedScore: 75,
+      recommendation: "고속도로에서 급제동하시는 경향이 있어요. 앞차와 거리 유지 부탁드려요",
+    },
+  },
+  // 안전 경로 (green)
   {
     id: "recommended",
     label: "내비추천",
@@ -169,48 +214,6 @@ const routeOptions: RouteOption[] = [
       brakeScore: 85,
       speedScore: 88,
       recommendation: "대로변이라 급정거 상황이 적어요. 평소대로 운전하셔도 괜찮아요",
-    },
-  },
-  {
-    id: "highway",
-    label: "고속도로우선",
-    time: 22,
-    distance: "11.3km",
-    taxiFare: "17,000원",
-    mapImage: "/images/kakaotalk-photo-2026-01-15-11-57-17-20004.jpeg",
-    safetyLevel: "orange",
-    impactScore: 70,
-    aiAnalysis: "경부고속도로 정체 구간 존재",
-    personalizedMessage: "지금 경부고속도로가 조금 막혀요. 그래도 괜찮으시다면 이 길도 나쁘지 않아요 🚗",
-    drivingTip: "정체 구간에서 자주 끼어들기가 있으니 여유롭게 가세요",
-    hazards: [{ id: "crowd", label: "정체구간", icon: "crowd" }],
-    drivingHabitAnalysis: {
-      brakeScore: 70,
-      speedScore: 75,
-      recommendation: "고속도로에서 급제동하시는 경향이 있어요. 앞차와 거리 유지 부탁드려요",
-    },
-  },
-  {
-    id: "shortest",
-    label: "거리우선",
-    time: 27,
-    distance: "9km",
-    taxiFare: "16,900원",
-    warning: "어린이 보호구역 포함",
-    mapImage: "/images/kakaotalk-photo-2026-01-15-11-57-16-20003.jpeg",
-    safetyLevel: "red",
-    impactScore: 45,
-    aiAnalysis: "어린이 보호구역 3곳 통과, 주의 필요",
-    personalizedMessage: "가장 짧은 길인데... 스쿨존이 3군데나 있어요. 조심조심 가주세요! 🚸",
-    drivingTip: "30km/h 제한구간이 많아요. 시간 여유 있으실 때 추천드려요",
-    hazards: [
-      { id: "school", label: "스쿨존", icon: "school" },
-      { id: "construction", label: "공사중", icon: "construction" },
-    ],
-    drivingHabitAnalysis: {
-      brakeScore: 55,
-      speedScore: 50,
-      recommendation: "스쿨존에서 속도 조절이 중요해요. 평소보다 더 천천히 가주세요",
     },
   },
 ]
@@ -354,7 +357,11 @@ function DrivingHabitBar({ label, score, color }: { label: string; score: number
   )
 }
 
-export default function KakaoMapMockup() {
+interface KakaoMapMockupProps {
+  onBack?: () => void
+}
+
+export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
   const [selectedTransport, setSelectedTransport] = useState<"car" | "bus" | "walk" | "bike">("car")
   const [selectedRoute, setSelectedRoute] = useState(0)
   const [showAIAnalysis, setShowAIAnalysis] = useState(false)
@@ -613,7 +620,7 @@ export default function KakaoMapMockup() {
           </div>
 
           {/* X 닫기 버튼 - 우측 끝 고정 */}
-          <button className="absolute right-0 flex h-10 w-10 items-center justify-center">
+          <button onClick={onBack} className="absolute right-0 flex h-10 w-10 items-center justify-center">
             <X className="h-7 w-7 text-white/80" strokeWidth={1.5} />
           </button>
         </div>

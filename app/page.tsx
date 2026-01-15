@@ -49,8 +49,8 @@ export default function Home() {
 
   if (currentScreen === "route") {
     return (
-      <main className="min-h-screen bg-background">
-        <KakaoMapMockup />
+      <main className="min-h-screen bg-background animate-in fade-in slide-in-from-right duration-300">
+        <KakaoMapMockup onBack={() => setCurrentScreen("main")} />
       </main>
     )
   }
