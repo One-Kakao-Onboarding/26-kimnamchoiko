@@ -94,7 +94,7 @@ interface RouteFilter {
 
 // 운전 습관 태그 데이터
 const drivingHabitTags: DrivingHabitTag[] = [
-  { id: "snow-speeding", label: "#눈길에도_과속", type: "bad" },
+  { id: "snow-speeding", label: "#눈길에도_조금빠름", type: "bad" },
   { id: "frequent-brake", label: "#급정거가_잦은편", type: "bad" },
   { id: "rain-speeding", label: "#빗길_과속", type: "bad" },
   { id: "tunnel-lane-change", label: "#터널_차선변경", type: "bad" },
@@ -106,7 +106,7 @@ const drivingHabitTags: DrivingHabitTag[] = [
 
 // 사용자 운전 습관 (예시 데이터)
 const userDrivingHabits: DrivingHabitTag[] = [
-  drivingHabitTags[0], // #눈길에도_과속
+  drivingHabitTags[0], // #눈길에도_조금빠름
   drivingHabitTags[1], // #급정거가_잦은편
 ]
 
@@ -123,7 +123,7 @@ const routeOptions: RouteOption[] = [
     safetyLevel: "red",
     impactScore: 45,
     aiAnalysis: "어린이 보호구역 3곳 통과, 주의 필요",
-    personalizedMessage: "가장 짧은 길인데... 스쿨존이 3군데나 있어요. 조심조심 가주세요! 🚸",
+    personalizedMessage: "어제 폭설 영향으로 그림님의 평소 출근 경로에 블랙 아이스가 의심되니, 오늘은 카맵 지킴이의 추천 경로 어때요?",
     drivingTip: "30km/h 제한구간이 많아요. 시간 여유 있으실 때 추천드려요",
     hazards: [
       { id: "school", label: "스쿨존", icon: "school" },
@@ -146,7 +146,7 @@ const routeOptions: RouteOption[] = [
     safetyLevel: "orange",
     impactScore: 65,
     aiAnalysis: "서판교IC 구간 결빙 주의",
-    personalizedMessage: "오늘 좀 추워요! 서판교IC 쪽에 결빙 구간이 있으니까 속도 조금만 줄여주세요 🧊",
+    personalizedMessage: "눈이 녹았다 얼기를 반복하면서\n일부 구간에서 미끄러질 수 있어요.\n속도를 살짝만 줄여도 훨씬 안전해요.",
     drivingTip: "평소 급가속하시는 편이라 이 구간은 천천히 가시는 게 좋겠어요",
     hazards: [
       { id: "ice", label: "결빙구간", icon: "ice" },
@@ -188,7 +188,7 @@ const routeOptions: RouteOption[] = [
     safetyLevel: "green",
     impactScore: 85,
     aiAnalysis: "AI 분석 결과 가장 안전한 경로",
-    personalizedMessage: "이 길이 가장 편하게 가실 수 있어요! CCTV도 많아서 안심이에요 ✨",
+    personalizedMessage: "블랙 아이스가 의심되는 구간을 피해 사고 가능성이 낮은 길로 안내했어요. 지금 선택이 더 안전할 것 같아요!",
     drivingTip: "평소 운전 스타일에 딱 맞는 경로예요",
     hazards: [{ id: "cctv", label: "CCTV 밀집", icon: "cctv" }],
     drivingHabitAnalysis: {
@@ -543,14 +543,19 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
         drivingHabitTag={userDrivingHabits.map((h) => h.label).join(", ")}
         warningMessage={
           currentRoute.safetyLevel === "red"
-            ? "이 경로는 위험 요소가 많아요!"
-            : "조금만 주의하시면 좋겠어요!"
+            ? "눈 오는 날 주행 속도가 여전히 조금 빨라요!"
+            : currentRoute.safetyLevel === "orange" ?
+            "오늘은 평소보다 조금 더 조심하면 좋아요." : "오늘은 이 길도 좋은 선택이에요!"
         }
         contextMessage={currentRoute.personalizedMessage}
         safetyLevel={currentRoute.safetyLevel === "orange" ? "orange" : "red"}
         newsArticles={[
           {
-            title: "[속보] 어젯밤 서해안고속도로 30중 추돌... '블랙아이스가 원인'",
+            title: currentRoute.safetyLevel === "red"
+              ? "[속보] 서해안고속도로 추돌 사고... \"도로 결빙 주의 필요\""
+              : currentRoute.safetyLevel === "orange"
+              ? "[속보] 출근 시간대 도로 결빙 사고 증가"
+              : "[속보] 서해안고속도로 추돌 사고… \"도로 결빙 주의 필요\"",
             source: "KBS 뉴스",
             thumbnail: "/images/news-placeholder.jpg",
             url: "#",
