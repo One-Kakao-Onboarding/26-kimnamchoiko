@@ -460,7 +460,7 @@ export default function KakaoMapMockup() {
   // Red Light Warning 수락 핸들러
   const handleAcceptSafeRoute = () => {
     setShowRedLightWarning(false)
-    setShowGreenLightSolution(true)
+    // Green Light Solution 패널은 표시하지 않음
     // 추천 경로로 자동 전환 (내비추천)
     const recommendedIndex = routeOptions.findIndex((r) => r.id === "recommended")
     if (recommendedIndex !== -1) {
