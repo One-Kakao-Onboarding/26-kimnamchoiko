@@ -657,28 +657,60 @@ export default function KakaoMapMockup() {
             <Layers className="h-5 w-5 text-gray-600" />
             <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-red-500" />
           </button>
-          <button
-            onClick={() => {
-              setShowAIAnalysis(!showAIAnalysis)
-              // AI 분석 패널이 닫힐 때 다시 경고 모달 표시
-              if (showAIAnalysis) {
-                if (selectedTransport === "car") {
-                  setShowRedLightWarning(true)
-                } else if (selectedTransport === "walk") {
-                  const currentHour = new Date().getHours()
-                  if (currentHour >= 21 || currentHour < 6) {
-                    setShowPedestrianSafetyAlert(true)
+          <div className="relative">
+            <button
+              onClick={() => {
+                // AI 분석 패널을 토글
+                if (!showAIAnalysis) {
+                  // 패널을 열 때는 그냥 열기만
+                  setShowAIAnalysis(true)
+                } else {
+                  // 패널을 닫을 때는 런칭 팝업(경고 모달) 표시
+                  setShowAIAnalysis(false)
+                  if (selectedTransport === "car") {
+                    setShowRedLightWarning(true)
+                  } else if (selectedTransport === "walk") {
+                    const currentHour = new Date().getHours()
+                    if (currentHour >= 21 || currentHour < 6) {
+                      setShowPedestrianSafetyAlert(true)
+                    }
                   }
                 }
-              }
-            }}
-            className={cn(
-              "relative flex h-11 w-11 items-center justify-center rounded-full border shadow-md transition-all duration-200",
-              showAIAnalysis ? "border-[#4A90E2] bg-[#4A90E2] text-white" : "border-gray-200 bg-white text-gray-600",
+              }}
+              className={cn(
+                "relative flex h-11 w-11 items-center justify-center rounded-full border shadow-md transition-all duration-200",
+                showAIAnalysis ? "border-[#4A90E2] bg-[#4A90E2] text-white" : "border-gray-200 bg-white text-gray-600",
+              )}
+            >
+              <Shield className="h-5 w-5" />
+            </button>
+
+            {/* 안전도 말풍선 메시지 */}
+            {!showAIAnalysis && (
+              <div className="absolute right-14 top-1/2 -translate-y-1/2 animate-in fade-in slide-in-from-right-2 duration-300">
+                <div className={cn(
+                  "relative rounded-lg px-3 py-2 shadow-lg whitespace-nowrap",
+                  currentRoute.safetyLevel === "green" && "bg-emerald-500",
+                  currentRoute.safetyLevel === "orange" && "bg-amber-500",
+                  currentRoute.safetyLevel === "red" && "bg-red-500"
+                )}>
+                  <p className="text-xs font-bold text-white">
+                    {currentRoute.safetyLevel === "green" && "✓ 안전한 경로예요"}
+                    {currentRoute.safetyLevel === "orange" && "⚠ 주의가 필요해요"}
+                    {currentRoute.safetyLevel === "red" && "⚡ 위험해요!"}
+                  </p>
+                  {/* 말풍선 꼬리 */}
+                  <div className={cn(
+                    "absolute right-0 top-1/2 -translate-y-1/2 translate-x-full",
+                    "w-0 h-0 border-l-8 border-y-4 border-y-transparent",
+                    currentRoute.safetyLevel === "green" && "border-l-emerald-500",
+                    currentRoute.safetyLevel === "orange" && "border-l-amber-500",
+                    currentRoute.safetyLevel === "red" && "border-l-red-500"
+                  )} />
+                </div>
+              </div>
             )}
-          >
-            <Shield className="h-5 w-5" />
-          </button>
+          </div>
         </div>
 
         {showAIAnalysis && (
