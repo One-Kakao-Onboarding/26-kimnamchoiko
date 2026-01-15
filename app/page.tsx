@@ -38,10 +38,12 @@ export default function Home() {
 
   if (currentScreen === "search") {
     return (
-      <SearchScreen
-        onBack={() => setCurrentScreen("main")}
-        onPlaceClick={() => setCurrentScreen("route")}
-      />
+      <div className="animate-in fade-in slide-in-from-right duration-300">
+        <SearchScreen
+          onBack={() => setCurrentScreen("main")}
+          onPlaceClick={() => setCurrentScreen("route")}
+        />
+      </div>
     )
   }
 
@@ -54,7 +56,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background animate-in fade-in duration-300">
       <KakaoMapMain onSearchClick={() => setCurrentScreen("search")} />
     </main>
   )
