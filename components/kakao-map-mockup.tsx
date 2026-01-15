@@ -902,20 +902,26 @@ export default function KakaoMapMockup({ onBack }: KakaoMapMockupProps) {
         <div className="absolute bottom-4 left-0 right-0 z-20">
           {/* 필터 버튼들 */}
           <div className="mb-2 flex gap-2 px-3">
-            {routeFilters.map((filter) => (
-              <button
-                key={filter.id}
-                onClick={() => toggleFilter(filter.id)}
-                className={cn(
-                  "shrink-0 rounded-full border px-3 py-1.5 text-sm shadow-sm transition-all duration-200",
-                  filter.active
-                    ? "border-[#4A90E2] bg-[#4A90E2] text-white"
-                    : "border-gray-200 bg-white text-gray-700 hover:border-gray-300",
-                )}
-              >
-                {filter.label}
-              </button>
-            ))}
+            {routeFilters.map((filter) => {
+              const isOrangeSafety = currentRoute.safetyLevel === "orange"
+              return (
+                <button
+                  key={filter.id}
+                  onClick={() => isOrangeSafety && toggleFilter(filter.id)}
+                  disabled={!isOrangeSafety}
+                  className={cn(
+                    "shrink-0 rounded-full border px-3 py-1.5 text-sm shadow-sm transition-all duration-200",
+                    !isOrangeSafety && "opacity-40 cursor-not-allowed",
+                    filter.active
+                      ? "border-[#4A90E2] bg-[#4A90E2] text-white"
+                      : "border-gray-200 bg-white text-gray-700 hover:border-gray-300",
+                    isOrangeSafety && !filter.active && "hover:border-gray-300",
+                  )}
+                >
+                  {filter.label}
+                </button>
+              )
+            })}
           </div>
 
           {/* 경로 정보 카드 스크롤 컨테이너 */}
