@@ -17,6 +17,9 @@ import {
   Heart,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import RedLightWarning from "@/components/red-light-warning"
+import GreenLightSolution from "@/components/green-light-solution"
+import PedestrianSafetyAlert from "@/components/pedestrian-safety-alert"
 
 // 교통수단 아이콘 컴포넌트
 function CarIcon({ className }: { className?: string }) {
@@ -51,6 +54,13 @@ function BikeIcon({ className }: { className?: string }) {
   )
 }
 
+// 운전 습관 태그 타입
+interface DrivingHabitTag {
+  id: string
+  label: string
+  type: "bad" | "good"
+}
+
 // 경로 타입 정의
 interface RouteOption {
   id: string
@@ -81,6 +91,24 @@ interface RouteFilter {
   label: string
   active: boolean
 }
+
+// 운전 습관 태그 데이터
+const drivingHabitTags: DrivingHabitTag[] = [
+  { id: "snow-speeding", label: "#눈길에도_과속", type: "bad" },
+  { id: "frequent-brake", label: "#급정거가_잦은편", type: "bad" },
+  { id: "rain-speeding", label: "#빗길_과속", type: "bad" },
+  { id: "tunnel-lane-change", label: "#터널_차선변경", type: "bad" },
+  { id: "defensive-driving", label: "#방어운전_만렙", type: "good" },
+  { id: "stop-line", label: "#정지선_칼준수", type: "good" },
+  { id: "rain-slow", label: "#빗길_감속주행", type: "good" },
+  { id: "best-driver", label: "#베스트드라이버", type: "good" },
+]
+
+// 사용자 운전 습관 (예시 데이터)
+const userDrivingHabits: DrivingHabitTag[] = [
+  drivingHabitTags[0], // #눈길에도_과속
+  drivingHabitTags[1], // #급정거가_잦은편
+]
 
 const routeOptions: RouteOption[] = [
   {
@@ -330,12 +358,31 @@ export default function KakaoMapMockup() {
   const [selectedTransport, setSelectedTransport] = useState<"car" | "bus" | "walk" | "bike">("car")
   const [selectedRoute, setSelectedRoute] = useState(0)
   const [showAIAnalysis, setShowAIAnalysis] = useState(false)
+  const [showRedLightWarning, setShowRedLightWarning] = useState(false)
+  const [showGreenLightSolution, setShowGreenLightSolution] = useState(false)
+  const [showPedestrianSafetyAlert, setShowPedestrianSafetyAlert] = useState(false)
 
   const [routeFilters, setRouteFilters] = useState<RouteFilter[]>([
     { id: "free-road", label: "무료도로", active: false },
     { id: "no-car-only", label: "자동차전용제외", active: false },
     { id: "child-safe", label: "어린이안심", active: false },
   ])
+
+  // 앱 실행 시 자동 경고 표시 (3초 후)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (selectedTransport === "car") {
+        setShowRedLightWarning(true)
+      } else if (selectedTransport === "walk") {
+        // 보행자 모드에서는 야간(21시 이후) 자동 표시
+        const currentHour = new Date().getHours()
+        if (currentHour >= 21 || currentHour < 6) {
+          setShowPedestrianSafetyAlert(true)
+        }
+      }
+    }, 3000)
+    return () => clearTimeout(timer)
+  }, [selectedTransport])
 
   const routeCardsRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -410,8 +457,92 @@ export default function KakaoMapMockup() {
   const currentRoute = routeOptions[selectedRoute]
   const currentSafetyColors = getSafetyColors(currentRoute.safetyLevel)
 
+  // Red Light Warning 수락 핸들러
+  const handleAcceptSafeRoute = () => {
+    setShowRedLightWarning(false)
+    setShowGreenLightSolution(true)
+    // 추천 경로로 자동 전환 (내비추천)
+    const recommendedIndex = routeOptions.findIndex((r) => r.id === "recommended")
+    if (recommendedIndex !== -1) {
+      setSelectedRoute(recommendedIndex)
+      scrollToRoute(recommendedIndex)
+    }
+  }
+
+  // Green Light Solution에서 안내 시작
+  const handleStartNavigation = () => {
+    setShowGreenLightSolution(false)
+    // 실제로는 여기서 네비게이션 시작
+    console.log("Navigation started with safe route")
+  }
+
+  // 보행자 안전 경로 수락
+  const handleAcceptPedestrianSafeRoute = () => {
+    setShowPedestrianSafetyAlert(false)
+    // 안전한 보행자 경로로 전환
+    console.log("Pedestrian safe route accepted")
+  }
+
   return (
     <div className="relative mx-auto h-[100dvh] w-full max-w-[430px] overflow-hidden bg-[#f5f5f5]">
+      {/* Red Light Warning 모달 */}
+      <RedLightWarning
+        isOpen={showRedLightWarning}
+        onClose={() => setShowRedLightWarning(false)}
+        onAcceptSafeRoute={handleAcceptSafeRoute}
+        userName="그림"
+        drivingHabitTag={userDrivingHabits.map((h) => h.label).join(", ")}
+        warningMessage="눈 오는 날 주행 속도가 여전히 조금 빨라요!"
+        contextMessage="오늘은 어제 폭설로 인해 그림님의 평소 경로에 블랙아이스 위험이 매우 높습니다."
+        newsArticles={[
+          {
+            title: "[속보] 어젯밤 서해안고속도로 30중 추돌... '블랙아이스가 원인'",
+            source: "KBS 뉴스",
+            thumbnail: "/images/news-placeholder.jpg",
+            url: "#",
+            publishedAt: "2시간 전",
+          },
+          {
+            title: "경기 용인·수지 일대 도로 곳곳 결빙 주의보",
+            source: "연합뉴스",
+            url: "#",
+            publishedAt: "4시간 전",
+          },
+        ]}
+      />
+
+      {/* Green Light Solution 모달 */}
+      <GreenLightSolution
+        isOpen={showGreenLightSolution}
+        onClose={() => setShowGreenLightSolution(false)}
+        onStartNavigation={handleStartNavigation}
+        userName="그림"
+        routeName="내비추천 경로"
+        solutionMessage="제가 딱 추천하고 싶은 경로예요!"
+        reasoningMessage="사고 구간을 피해, 제설 작업이 완료된 큰 도로 위주로 안내합니다. 5분 더 걸리지만 훨씬 안전해요."
+        userTags={[...userDrivingHabits.map((h) => h.label), "#방어운전_만렙"]}
+        estimatedTime={22}
+        distance="10.7km"
+        safetyScore={85}
+      />
+
+      {/* 보행자 안심 귀가 알림 */}
+      <PedestrianSafetyAlert
+        isOpen={showPedestrianSafetyAlert}
+        onClose={() => setShowPedestrianSafetyAlert(false)}
+        onAcceptSafeRoute={handleAcceptPedestrianSafeRoute}
+        userName="민지"
+        situationMessage="평소 가시던 길 인근에 최근 좋지 않은 사건 이력이 있어요"
+        contextMessage="시간이 늦었으니, 오늘은 조금 돌아가더라도 사람들이 많이 다니는 대로변으로 가는 게 어때요?"
+        safeRouteFeatures={[
+          { id: "cctv", label: "CCTV 밀집", icon: "cctv" },
+          { id: "store", label: "24시간 편의점", icon: "store" },
+          { id: "police", label: "지구대 인근", icon: "police" },
+          { id: "light", label: "밝은 조명", icon: "light" },
+        ]}
+        timeDifference={7}
+      />
+
       {/* 파란색 헤더 */}
       <header className="relative z-20 bg-[#4A90E2] px-4 pb-3 pt-3">
         {/* 교통수단 선택 - 중앙 배치, X 버튼 우측 끝 */}
@@ -527,7 +658,20 @@ export default function KakaoMapMockup() {
             <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-red-500" />
           </button>
           <button
-            onClick={() => setShowAIAnalysis(!showAIAnalysis)}
+            onClick={() => {
+              setShowAIAnalysis(!showAIAnalysis)
+              // AI 분석 패널이 닫힐 때 다시 경고 모달 표시
+              if (showAIAnalysis) {
+                if (selectedTransport === "car") {
+                  setShowRedLightWarning(true)
+                } else if (selectedTransport === "walk") {
+                  const currentHour = new Date().getHours()
+                  if (currentHour >= 21 || currentHour < 6) {
+                    setShowPedestrianSafetyAlert(true)
+                  }
+                }
+              }
+            }}
             className={cn(
               "relative flex h-11 w-11 items-center justify-center rounded-full border shadow-md transition-all duration-200",
               showAIAnalysis ? "border-[#4A90E2] bg-[#4A90E2] text-white" : "border-gray-200 bg-white text-gray-600",
@@ -556,6 +700,34 @@ export default function KakaoMapMockup() {
                 </div>
                 <TrafficLightIndicator level={currentRoute.safetyLevel} />
               </div>
+
+              {/* 사용자 운전 습관 태그 표시 */}
+              {selectedTransport === "car" && userDrivingHabits.length > 0 && (
+                <div className="mb-4 rounded-xl bg-amber-50 border border-amber-200 p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Shield className="h-4 w-4 text-amber-600" />
+                    <span className="text-xs font-semibold text-amber-900">회원님의 운전 성향</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {userDrivingHabits.map((habit) => (
+                      <div
+                        key={habit.id}
+                        className={cn(
+                          "rounded-full px-2.5 py-1 text-xs font-medium",
+                          habit.type === "bad"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-emerald-100 text-emerald-700"
+                        )}
+                      >
+                        {habit.label}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-amber-700 mt-2 leading-relaxed">
+                    이 습관들을 고려하여 안전한 경로를 추천해드려요
+                  </p>
+                </div>
+              )}
 
               {/* 개인화된 AI 멘트 - 구어체 */}
               <div className={cn("rounded-xl p-3.5 mb-4", currentSafetyColors.bgLight)}>
